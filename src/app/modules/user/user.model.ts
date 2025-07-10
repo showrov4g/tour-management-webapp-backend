@@ -1,11 +1,14 @@
-import { Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 import { IAuthProvider, isActive, IUser, Role } from "./user.controller";
 
 
 
 // auth provider schema 
 
-const authProviderSchema = new Schema <IAuthProvider>({},{
+const authProviderSchema = new Schema <IAuthProvider>({
+    provider: {type: String, required: true},
+    providerId: {type: String, required: true}
+},{
     versionKey: false,
     _id: false
 })
@@ -28,14 +31,13 @@ const userSchema = new Schema<IUser>({
         default: isActive.ACTIVE
     },
     isVerified: {type: String, default: false},
-    auth: {
-        type:[ {
-            provider: {type: String, required: true}
-        }]
-    }
+    auth: [authProviderSchema]
 
 },{
     timestamps: true,
     versionKey: false,
 
 }) 
+
+
+export const User = model<IUser>("User", userSchema)
