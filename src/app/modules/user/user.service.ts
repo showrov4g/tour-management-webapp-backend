@@ -10,6 +10,9 @@ const createUser = async (payload : Partial<IUser>)=>{
         return user;
 }
 
+// all user data getting api making
+
+
 
 export const UserServices = {
     createUser

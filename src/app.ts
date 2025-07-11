@@ -1,9 +1,9 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { router } from "./app/routes";
-
-import { envVars } from "./config/env";
+import httpStatus from "http-status-codes"
 import { globalErrorHandler } from "./app/middlewars/globalerrorhandelar";
+import { notFound } from "./app/middlewars/notFound";
 
 const app = express();
 
@@ -24,6 +24,7 @@ app.get("/", (req: Request,res: Response)=>{
 // global error handle 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
 app.use(globalErrorHandler);
+app.use(notFound)
 
 
 
