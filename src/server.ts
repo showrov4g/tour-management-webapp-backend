@@ -1,3 +1,7 @@
+
+
+
+// =====================================================
 /* eslint-disable no-console */
 import { Server} from "http"
 import mongoose from "mongoose";
@@ -7,13 +11,16 @@ import { envVars } from "./config/env";
 
 let server: Server;
 
+const PORT = Number(envVars.PORT)|| 5000;
+
+
 const startServer = async () => {
     try {
         await mongoose.connect(envVars.DB_URL);
 
         console.log("connect to the database ");
-       server = app.listen(envVars.PORT, () => {
-            console.log(`Server is listing on port ${envVars.PORT}`)
+       server = app.listen(PORT, () => {
+            console.log(`Server is listing on port ${PORT}`)
         })
     } catch (error) {
         console.log(error)
@@ -57,7 +64,7 @@ process.on("SIGINT", ()=>{
 
 
 
-// unhandled rejection error 
-// Promise.reject(new Error("i forget to catch this error"))
-// uncaught exception error 
-// throw new Error("I forget to handle this local error")
+// // unhandled rejection error 
+// // Promise.reject(new Error("i forget to catch this error"))
+// // uncaught exception error 
+// // throw new Error("I forget to handle this local error")
