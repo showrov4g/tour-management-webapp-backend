@@ -1,6 +1,7 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { router } from "./app/routes";
+import httpStatus from "http-status-codes";
 
 const app = express();
 
@@ -17,6 +18,16 @@ app.get("/", (req: Request,res: Response)=>{
 
     })
 })
+
+// global error handle 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  res.status(httpStatus.BAD_GATEWAY).json({
+    success: false,
+    message: `Something went wrong: ${err.message}`,
+    err,
+  });
+});
 
 
 
