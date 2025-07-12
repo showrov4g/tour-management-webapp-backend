@@ -8,6 +8,10 @@ const moduleRoutes =[
     {
         path: "/user",
         route: UserRoutes
+    },
+    {
+        path: "/all-user",
+        route: UserRoutes
     }
 ];
 

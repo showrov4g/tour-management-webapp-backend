@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from "express";
 import { User } from "./user.model";
-import httpStatus from "http-status-codes";
+import httpStatus, { StatusCodes } from "http-status-codes";
 import { UserServices } from "./user.service";
 import AppError from "../../errorClass/AppError";
 import { catchAsync } from "../../utils/catchAsync";
@@ -38,18 +38,29 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
 // }
 
 // get all user controllers 
-const getALlUser = async(req: Request, res: Response, next: NextFunction) =>{
-    try {
-        const users =await UserServices.getAllUser(); 
-        return users;
-    } catch (error: any) {
-        console.log(error);
-        next(error)
-    }
-}
+
+const getAllUser = catchAsync(async (req: Request, res: Response, next: NextFunction)=>{
+    const users =await UserServices.getAllUser();
+    res.status(StatusCodes.OK).json({
+        success: true,
+        message: "All user data found",
+        users
+    })
+})
+
+
+// const getALlUser = async(req: Request, res: Response, next: NextFunction) =>{
+//     try {
+//         const users =await UserServices.getAllUser(); 
+//         return users;
+//     } catch (error: any) {
+//         console.log(error);
+//         next(error)
+//     }
+// }
 
 
 export const UserControllers = {
     createUser,
-    getALlUser
+    getAllUser
 }
