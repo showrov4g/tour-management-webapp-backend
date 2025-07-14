@@ -1,20 +1,46 @@
-import { IUser } from "./user.interface";
+import { StatusCodes } from "http-status-codes";
+import AppError from "../../errorClass/AppError";
+import { IAuthProvider, IUser } from "./user.interface";
 import { User } from "./user.model";
+import bcryptjs from "bcryptjs"
 
-const createUser = async (payload : Partial<IUser>)=>{
-    const {name, email} = payload;
-        const user = await User.create({
-            name,
-            email
-        });
-        return user;
+
+
+const createUser = async (payload: Partial<IUser>) => {
+    const { email, password, ...rest } = payload;
+
+    const isUserExist = await User.findOne({ email });
+    if (isUserExist) {
+        throw new AppError(StatusCodes.BAD_REQUEST, "user Already exit")
+    }
+
+    const hashedPassword = bcryptjs.hash(password as string, 10)
+
+    console.log(hashedPassword)
+
+
+
+
+    const authProvider: IAuthProvider = { provider: "credential", providerId: email as string }
+
+   
+
+
+
+    // const user = await User.create({
+
+    //     email,
+    //     auth: [authProvider],
+    //     ...rest
+    // });
+    // return user;
 }
 
 // all user data getting api making
-const getAllUser = async()=>{
+const getAllUser = async () => {
     const users = await User.find()
 
-    const totalUser =  await User.countDocuments()
+    const totalUser = await User.countDocuments()
 
     return {
         data: users,
@@ -26,6 +52,6 @@ const getAllUser = async()=>{
 
 
 export const UserServices = {
-    createUser, 
+    createUser,
     getAllUser
 }
