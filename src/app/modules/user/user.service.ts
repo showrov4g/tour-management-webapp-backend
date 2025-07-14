@@ -14,26 +14,20 @@ const createUser = async (payload: Partial<IUser>) => {
         throw new AppError(StatusCodes.BAD_REQUEST, "user Already exit")
     }
 
-    const hashedPassword = bcryptjs.hash(password as string, 10)
-
-    console.log(hashedPassword)
-
-
+    const hashedPassword = await bcryptjs.hash(password as string, 10);
 
 
     const authProvider: IAuthProvider = { provider: "credential", providerId: email as string }
 
    
+    const user = await User.create({
 
-
-
-    // const user = await User.create({
-
-    //     email,
-    //     auth: [authProvider],
-    //     ...rest
-    // });
-    // return user;
+        email,
+        password : hashedPassword,
+        auth: [authProvider],
+        ...rest
+    });
+    return user;
 }
 
 // all user data getting api making

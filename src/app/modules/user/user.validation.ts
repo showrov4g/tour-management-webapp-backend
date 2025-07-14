@@ -6,11 +6,11 @@ export const createUserZodSchema = z.object({
     name: z.string({ invalid_type_error: "name must be string" })
         .min(2, { message: "Name is too short" })
         .max(50, { message: "Name is too big" }),
-    user: z.string(),
+    // user: z.string(),
     email: z.string().email()
         .min(5, { message: "email must be at last 5 character " })
         .max(20, { message: "email not more than 20 character" }),
-    password: z.string()
+    password : z.string()
         .min(8)
         .regex(passwordRegex, { message: "Password must include uppercase, lowercase, number, and special character" }),
     phone: z.string({ invalid_type_error: "number must be string" })
