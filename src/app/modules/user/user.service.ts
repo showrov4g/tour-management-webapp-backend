@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import AppError from "../../errorClass/AppError";
-import { IAuthProvider, IUser, Role } from "./user.interface";
+import { IAuthProvider, isActive, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
 import bcryptjs from "bcryptjs"
 import { JwtPayload } from "jsonwebtoken";
@@ -33,6 +33,16 @@ const createUser = async (payload: Partial<IUser>) => {
 }
 
 const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken: JwtPayload) => {
+
+    const ifUserExist = await User.findById(userId);
+    if (!ifUserExist) {
+        throw new AppError(StatusCodes.NOT_FOUND, "User not found")
+    }
+    // not necessary thing
+    // if (ifUserExist.isDeleted || ifUserExist.isActive === isActive.BLOCKED) {
+    //     throw new AppError(StatusCodes.FORBIDDEN, "You can't update your profile")
+    // }
+
     if (payload.role) {
         if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
             throw new AppError(StatusCodes.FORBIDDEN, "You are not able to change this data")
@@ -47,8 +57,10 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
         }
     }
     if (payload.password) {
-        payload.password = await bcryptjs.hash(payload.password, envVars.BCRYPT_SOLT_ROUND);
+        payload.password = await bcryptjs.hash(payload.password, Number(envVars.BCRYPT_SOLT_ROUND));
     }
+    const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, { new: true, runValidators: true })
+    return newUpdatedUser;
 }
 
 
@@ -70,5 +82,6 @@ const getAllUser = async () => {
 
 export const UserServices = {
     createUser,
-    getAllUser
+    getAllUser,
+    updateUser
 }

@@ -17,6 +17,7 @@ export const checkAuth = (...authRoles: string[]) => async (req: Request, res: R
             throw new AppError(403, "you are not allow to visit this page")
         }
 
+        req.user = verifiedToken
         next();
 
     } catch (error) {
