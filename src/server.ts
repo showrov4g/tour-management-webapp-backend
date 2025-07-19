@@ -3,15 +3,16 @@
 
 // =====================================================
 /* eslint-disable no-console */
-import { Server} from "http"
+import { Server } from "http"
 import mongoose from "mongoose";
 import app from "./app";
 import { envVars } from "./config/env";
+import { seedSupperAdmin } from "./app/utils/seedSupperAdmin";
 
 
 let server: Server;
 
-const PORT = Number(envVars.PORT)|| 5000;
+const PORT = Number(envVars.PORT) || 5000;
 
 
 const startServer = async () => {
@@ -19,7 +20,7 @@ const startServer = async () => {
         await mongoose.connect(envVars.DB_URL);
 
         console.log("connect to the database ");
-       server = app.listen(PORT, () => {
+        server = app.listen(PORT, () => {
             console.log(`Server is listing on port ${PORT}`)
         })
     } catch (error) {
@@ -27,36 +28,38 @@ const startServer = async () => {
     }
 }
 
-startServer();
+(async() => {
+   await startServer();
+   await seedSupperAdmin();
+}) ()
 
-
-process.on("uncaughtException", (err)=>{
+process.on("uncaughtException", (err) => {
     console.log("uncaught exception Detected", err);
-    if(server){
-        server.close(()=>{
-             process.exit()
+    if (server) {
+        server.close(() => {
+            process.exit()
         })
-        
+
     }
 });
 
-process.on("SIGABRT", ()=>{
+process.on("SIGABRT", () => {
     console.log("SIGABRT signal received....., server  ");
-    if(server){
-        server.close(()=>{
-             process.exit()
+    if (server) {
+        server.close(() => {
+            process.exit()
         })
-        
+
     }
 });
 
-process.on("SIGINT", ()=>{
+process.on("SIGINT", () => {
     console.log("SIGINT signal received....., server  ");
-    if(server){
-        server.close(()=>{
-              process.exit()
+    if (server) {
+        server.close(() => {
+            process.exit()
         })
-       
+
     }
 })
 
@@ -64,7 +67,7 @@ process.on("SIGINT", ()=>{
 
 
 
-// // unhandled rejection error 
+// // unhandled rejection error
 // // Promise.reject(new Error("i forget to catch this error"))
-// // uncaught exception error 
+// // uncaught exception error
 // // throw new Error("I forget to handle this local error")

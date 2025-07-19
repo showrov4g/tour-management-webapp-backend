@@ -30,8 +30,8 @@ export interface IUser {
     address ?: string;
     isDeleted ?: string;
     isActive ?: isActive;
-    isVerified ?: string;
-    role: "USER" | "ADMIN" | "GUIDE";
+    isVerified ?: boolean;
+    role: Role;
     auth: IAuthProvider[];
     bookings ?: Types.ObjectId[];
     guides ?: Types.ObjectId[];
