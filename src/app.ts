@@ -4,10 +4,11 @@ import { router } from "./app/routes";
 import httpStatus from "http-status-codes"
 import { globalErrorHandler } from "./app/middlewars/globalerrorhandelar";
 import { notFound } from "./app/middlewars/notFound";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
-
+app.use(cookieParser())
 app.use(cors());
 app.use(express.json());
 
