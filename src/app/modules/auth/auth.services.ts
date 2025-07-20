@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { StatusCodes } from "http-status-codes";
 import { isActive, IUser } from "../user/user.interface"
 import AppError from "../../errorClass/AppError";
@@ -51,19 +52,34 @@ const credentialLogin = async (payload: Partial<IUser>) => {
 
 
 }
-const getNewAccessToken = async (refreshToken: string) : Promise<{ accessToken: string }>=> {
+const getNewAccessToken = async (refreshToken: string): Promise<{ accessToken: string }> => {
     const newAccessToken = await createNewAccessTokenWithRefreshToken(refreshToken);
 
 
     return {
-        accessToken : newAccessToken
+        accessToken: newAccessToken
     }
 
+
+}
+const resetPassword = async (oldPassword: string, newPassword: string, decodedToken: JwtPayload) => {
+    const user = await User.findById(decodedToken.userId);
+
+
+    const isOldPasswordMatch = await bcryptjs.compare(oldPassword, user!.password as string);
+    if (!isOldPasswordMatch) {
+        throw new AppError(StatusCodes.BAD_REQUEST, "your password is not match")
+    }
+    user!.password = await bcryptjs.hash(newPassword, Number(envVars.BCRYPT_SOLT_ROUND));
+    user!.save();
+
+ 
 
 }
 
 
 export const authServices = {
     credentialLogin,
-    getNewAccessToken
+    getNewAccessToken,
+    resetPassword
 }

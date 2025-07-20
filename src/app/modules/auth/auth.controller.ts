@@ -16,7 +16,7 @@ const credentialLogin = catchAsync(async (req: Request, res: Response, next: Nex
     //     secure: false
     // })
 
-    setAuthCookies(res,loginInfo)
+    setAuthCookies(res, loginInfo)
 
     // res.cookie("refreshToken", loginInfo.refreshToken, {
     //     httpOnly: true,
@@ -75,13 +75,16 @@ const logout = catchAsync(async (req: Request, res: Response, next: NextFunction
     })
 })
 const resetPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-
- 
+    
+    const oldPassword = req.body.newPassword;
+    const newPassword = req.body.password;
+    const decodedToken = req.user
+    const newUpdatePassword = await authServices.resetPassword(oldPassword, newPassword, decodedToken)
 
     sendResponse(res, {
         success: true,
         statusCode: StatusCodes.OK,
-        message: "user Logout successfully ",
+        message: " your password reset successfully ",
         data: null,
     })
 })

@@ -5,9 +5,18 @@ import httpStatus from "http-status-codes"
 import { globalErrorHandler } from "./app/middlewars/globalerrorhandelar";
 import { notFound } from "./app/middlewars/notFound";
 import cookieParser from "cookie-parser";
+import passport from "passport";
+import expressSession from "express-session"
 
 const app = express();
 
+app.use(expressSession({
+    secret : "your secret",
+    resave: false,
+    saveUninitialized: false
+}))
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(cookieParser())
 app.use(cors());
 app.use(express.json());
