@@ -11,47 +11,38 @@ import { createNewAccessTokenWithRefreshToken, createUserToken } from "../../uti
 
 const credentialLogin = async (payload: Partial<IUser>) => {
     const { email, password } = payload;
-    const isUserExist = await User.findOne({ email });
-    if (!isUserExist) {
-        throw new AppError(StatusCodes.BAD_REQUEST, "Email not found")
+
+    if (!email || !password) {
+        throw new AppError(StatusCodes.BAD_REQUEST, "Email and password are required");
     }
 
-    const isPasswordMatch = await bcryptjs.compare(password as string, isUserExist.password as string);
+    const isUserExist = await User.findOne({ email });
+
+    if (!isUserExist) {
+        throw new AppError(StatusCodes.BAD_REQUEST, "Email not found");
+    }
+
+    if (!isUserExist.password) {
+        throw new AppError(StatusCodes.BAD_REQUEST, "Password is not set for this user");
+    }
+
+    const isPasswordMatch = await bcryptjs.compare(password, isUserExist.password);
 
     if (!isPasswordMatch) {
-        throw new AppError(StatusCodes.BAD_REQUEST, "Incorrect password")
+        throw new AppError(StatusCodes.BAD_REQUEST, "Incorrect password");
     }
 
-    // const jwtPayload = {
-    //     userId: isUserExist._id,
-    //     email : isUserExist.email,
-    //     role: isUserExist.role,
+    const usersToken = createUserToken(isUserExist);
 
-    // }
-
-    // // jwt implement 
-    // const accessToken = generateToken(jwtPayload, envVars.JWT_ACCESS_SECRET, envVars.JWT_ACCESS_EXPIRES)
-    // // refresh token 
-
-    // const refreshToken = generateToken(jwtPayload, envVars.JWT_REFRESH_SECRET, envVars.JWT_REFRESH_EXPIRES)
-
-    const usersToken = createUserToken(isUserExist)
-
-    // const accessToken = jwt.sign(jwtPayload, "ghosh",{
-    //     expiresIn: "1d"
-    // })
-
-    // delete isUserExist.password;
     const { password: pass, ...rest } = isUserExist.toObject();
 
     return {
         accessToken: usersToken.accessToken,
         refreshToken: usersToken.refreshToken,
-        user: rest
-    }
+        user: rest,
+    };
+};
 
-
-}
 const getNewAccessToken = async (refreshToken: string): Promise<{ accessToken: string }> => {
     const newAccessToken = await createNewAccessTokenWithRefreshToken(refreshToken);
 
