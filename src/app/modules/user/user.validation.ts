@@ -15,7 +15,10 @@ export const createUserZodSchema = z.object({
         .regex(passwordRegex, { message: "Password must include uppercase, lowercase, number, and special character" }),
     phone: z.string({ invalid_type_error: "number must be string" })
         .regex(/^(?:\+88|88)?01[3-9]\d{8}$/, { message: "phone number must be in Bangladeshi Standard" }),
-    address: z.string({ invalid_type_error: "Address must be string" }).max(200, { message: "address must be under 200 character" }).optional()
+    address: z.string({ invalid_type_error: "Address must be string" }).max(200, { message: "address must be under 200 character" }).optional(),
+        isActive: z.enum(Object.values(isActive)as [string]).optional(),
+    isDeleted: z.boolean({invalid_type_error: "isDeleted must be true or false"}).optional(),
+    isVerified: z.boolean({invalid_type_error: "isVerified must be true or false"}).optional(),
 
 });
 

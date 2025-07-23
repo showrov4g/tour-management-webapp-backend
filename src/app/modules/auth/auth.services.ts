@@ -9,39 +9,39 @@ import { generateToken, verifyToken } from "../../utils/jwt";
 import { envVars } from "../../../config/env";
 import { createNewAccessTokenWithRefreshToken, createUserToken } from "../../utils/userToken";
 
-const credentialLogin = async (payload: Partial<IUser>) => {
-    const { email, password } = payload;
+// const credentialLogin = async (payload: Partial<IUser>) => {
+//     const { email, password } = payload;
 
-    if (!email || !password) {
-        throw new AppError(StatusCodes.BAD_REQUEST, "Email and password are required");
-    }
+//     if (!email || !password) {
+//         throw new AppError(StatusCodes.BAD_REQUEST, "Email and password are required");
+//     }
 
-    const isUserExist = await User.findOne({ email });
+//     const isUserExist = await User.findOne({ email });
 
-    if (!isUserExist) {
-        throw new AppError(StatusCodes.BAD_REQUEST, "Email not found");
-    }
+//     if (!isUserExist) {
+//         throw new AppError(StatusCodes.BAD_REQUEST, "Email not found");
+//     }
 
-    if (!isUserExist.password) {
-        throw new AppError(StatusCodes.BAD_REQUEST, "Password is not set for this user");
-    }
+//     if (!isUserExist.password) {
+//         throw new AppError(StatusCodes.BAD_REQUEST, "Password is not set for this user");
+//     }
 
-    const isPasswordMatch = await bcryptjs.compare(password, isUserExist.password);
+//     const isPasswordMatch = await bcryptjs.compare(password, isUserExist.password);
 
-    if (!isPasswordMatch) {
-        throw new AppError(StatusCodes.BAD_REQUEST, "Incorrect password");
-    }
+//     if (!isPasswordMatch) {
+//         throw new AppError(StatusCodes.BAD_REQUEST, "Incorrect password");
+//     }
 
-    const usersToken = createUserToken(isUserExist);
+//     const usersToken = createUserToken(isUserExist);
 
-    const { password: pass, ...rest } = isUserExist.toObject();
+//     const { password: pass, ...rest } = isUserExist.toObject();
 
-    return {
-        accessToken: usersToken.accessToken,
-        refreshToken: usersToken.refreshToken,
-        user: rest,
-    };
-};
+//     return {
+//         accessToken: usersToken.accessToken,
+//         refreshToken: usersToken.refreshToken,
+//         user: rest,
+//     };
+// };
 
 const getNewAccessToken = async (refreshToken: string): Promise<{ accessToken: string }> => {
     const newAccessToken = await createNewAccessTokenWithRefreshToken(refreshToken);
@@ -70,7 +70,7 @@ const resetPassword = async (oldPassword: string, newPassword: string, decodedTo
 
 
 export const authServices = {
-    credentialLogin,
+    // credentialLogin,
     getNewAccessToken,
     resetPassword
 }
