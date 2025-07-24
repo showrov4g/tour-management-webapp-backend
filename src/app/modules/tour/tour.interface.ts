@@ -18,3 +18,9 @@ export interface ITour {
     division : Types.ObjectId,
     tourType: Types.ObjectId,
 }
+
+
+export interface ITourTypes{
+    name: string,
+    
+}
