@@ -1,10 +1,11 @@
-export interface TErrorsource {
-  path: string,
-  message: string
+export interface TErrorSources {
+    path: string;
+    message: string
 }
 
-export interface TGenericErrorCode {
-  statusCode: string | number,
-  message: string,
-  errorSocurse?: TexImageSource[]
+export interface TGenericErrorResponse {
+    statusCode: number,
+    message: string,
+    errorSources?: TErrorSources[]
+
 }

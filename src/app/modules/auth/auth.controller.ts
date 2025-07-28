@@ -1,17 +1,18 @@
-import { NextFunction, Request, Response } from "express";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NextFunction, Request, Response } from "express"
+import httpStatus from "http-status-codes"
+import { JwtPayload } from "jsonwebtoken"
+import passport from "passport"
+import { envVars } from "../../config/env"
+import AppError from "../../errorHelpers/AppError"
 import { catchAsync } from "../../utils/catchAsync"
-import { sendResponse } from "../../utils/sendResponse";
-import { StatusCodes } from "http-status-codes";
-import { authServices } from "./auth.services";
-import AppError from "../../errorClass/AppError";
-import { setAuthCookies } from "../../utils/set.cookie";
-import { createUserToken } from "../../utils/userToken";
-import { envVars } from "../../../config/env";
-import { JwtPayload } from "jsonwebtoken";
-import passport from "passport";
+import { sendResponse } from "../../utils/sendResponse"
+import { setAuthCookie } from "../../utils/setCookie"
+import { createUserTokens } from "../../utils/userTokens"
+import { AuthServices } from "./auth.service"
 
-const credentialLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-
+const credentialsLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // const loginInfo = await AuthServices.credentialsLogin(req.body)
 
     passport.authenticate("local", async (err: any, user: any, info: any) => {
@@ -36,18 +37,18 @@ const credentialLogin = catchAsync(async (req: Request, res: Response, next: Nex
             return next(new AppError(401, info.message))
         }
 
-        const userTokens = await createUserToken(user)
+        const userTokens = await createUserTokens(user)
 
         // delete user.toObject().password
 
         const { password: pass, ...rest } = user.toObject()
 
 
-        setAuthCookies(res, userTokens)
+        setAuthCookie(res, userTokens)
 
         sendResponse(res, {
             success: true,
-            statusCode: StatusCodes.OK,
+            statusCode: httpStatus.OK,
             message: "User Logged In Successfully",
             data: {
                 accessToken: userTokens.accessToken,
@@ -69,29 +70,29 @@ const credentialLogin = catchAsync(async (req: Request, res: Response, next: Nex
     //     secure: false,
     // })
 
+
 })
 const getNewAccessToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-        throw new AppError(StatusCodes.BAD_REQUEST, "No token found from cookies")
+        throw new AppError(httpStatus.BAD_REQUEST, "No refresh token recieved from cookies")
     }
+    const tokenInfo = await AuthServices.getNewAccessToken(refreshToken as string)
 
-    const tokenInfo = await authServices.getNewAccessToken(refreshToken as string);
     // res.cookie("accessToken", tokenInfo.accessToken, {
     //     httpOnly: true,
     //     secure: false
     // })
-    setAuthCookies(res, tokenInfo)
+
+    setAuthCookie(res, tokenInfo);
 
     sendResponse(res, {
         success: true,
-        statusCode: StatusCodes.CREATED,
-        message: "Login successfully ",
+        statusCode: httpStatus.OK,
+        message: "New Access Token Retrived Successfully",
         data: tokenInfo,
     })
 })
-// logout function make 
 const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
     res.clearCookie("accessToken", {
@@ -105,63 +106,61 @@ const logout = catchAsync(async (req: Request, res: Response, next: NextFunction
         sameSite: "lax"
     })
 
-
     sendResponse(res, {
         success: true,
-        statusCode: StatusCodes.OK,
-        message: "user Logout successfully ",
+        statusCode: httpStatus.OK,
+        message: "User Logged Out Successfully",
         data: null,
     })
 })
 const resetPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-    const oldPassword = req.body.newPassword;
-    const newPassword = req.body.password;
+    const newPassword = req.body.newPassword;
+    const oldPassword = req.body.oldPassword;
     const decodedToken = req.user
-    await authServices.resetPassword(oldPassword, newPassword, decodedToken as JwtPayload)
+
+    await AuthServices.resetPassword(oldPassword, newPassword, decodedToken as JwtPayload);
 
     sendResponse(res, {
         success: true,
-        statusCode: StatusCodes.OK,
-        message: " your password reset successfully ",
+        statusCode: httpStatus.OK,
+        message: "Password Changed Successfully",
         data: null,
     })
 })
-const googleCallback = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-
+const googleCallbackController = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
     let redirectTo = req.query.state ? req.query.state as string : ""
 
-    if (redirectTo.startsWith('/')) {
+    if (redirectTo.startsWith("/")) {
         redirectTo = redirectTo.slice(1)
     }
 
-
+    // /booking => booking , => "/" => ""
     const user = req.user;
-    console.log("user", user);
+
     if (!user) {
-        throw new AppError(StatusCodes.NOT_FOUND, "User data not found")
+        throw new AppError(httpStatus.NOT_FOUND, "User Not Found")
     }
-    const tokenInfo = createUserToken(user);
-    setAuthCookies(res, tokenInfo)
+
+    const tokenInfo = createUserTokens(user)
+
+    setAuthCookie(res, tokenInfo)
 
     // sendResponse(res, {
     //     success: true,
-    //     statusCode: StatusCodes.OK,
-    //     message: " your password reset successfully ",
+    //     statusCode: httpStatus.OK,
+    //     message: "Password Changed Successfully",
     //     data: null,
     // })
+
     res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`)
 })
 
-
-
-
-
-export const authControllers = {
-    credentialLogin,
+export const AuthControllers = {
+    credentialsLogin,
     getNewAccessToken,
     logout,
     resetPassword,
-    googleCallback
+    googleCallbackController
 }

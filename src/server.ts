@@ -6,8 +6,8 @@
 import { Server } from "http"
 import mongoose from "mongoose";
 import app from "./app";
-import { envVars } from "./config/env";
-import { seedSupperAdmin } from "./app/utils/seedSupperAdmin";
+import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
+import { envVars } from "./app/config/env";
 
 
 let server: Server;
@@ -30,7 +30,7 @@ const startServer = async () => {
 
 (async() => {
    await startServer();
-   await seedSupperAdmin();
+   await seedSuperAdmin();
 }) ()
 
 process.on("uncaughtException", (err) => {
